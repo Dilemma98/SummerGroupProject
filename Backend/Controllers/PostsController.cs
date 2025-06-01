@@ -19,5 +19,20 @@ namespace Backend.Controllers
         {
             return Ok(posts);
         }
+
+        [HttpPost]
+        public IActionResult CreatePost([FromBody] Post post)
+        {
+            if (post == null || string.IsNullOrEmpty(post.Title) || string.IsNullOrEmpty(post.Content) || string.IsNullOrEmpty(post.Author))
+            {
+                return BadRequest("Invalid post data.");
+            }
+
+            // Simple ID generation
+            post.Id = posts.Count + 1;
+            post.CreatedAt = DateTime.Now;
+            posts.Add(post);
+            return CreatedAtAction(nameof(GetPosts), new { id = post.Id }, post);
+        }
     }
 }
