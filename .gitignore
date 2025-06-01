@@ -1,0 +1,35 @@
+# .NET-build
+bin/
+obj/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Rider / VS Code / VS
+.vscode/
+.idea/
+*.code-workspace
+
+# OS-filer
+.DS_Store
+Thumbs.db
+
+# Paket/beroenden
+packages/
+*.nupkg
+project.lock.json
+project.fragment.lock.json
+
+# Logs
+*.log
+
+# Publish
+publish/
+*.publish.xml
+
+# Secrets
+secrets.json
+
+# Test results
+TestResults/
