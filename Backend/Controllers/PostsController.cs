@@ -66,5 +66,18 @@ namespace Backend.Controllers
             }
             return Ok(post);
         }
+
+        [HttpDelete("{id}")]
+        public IActionResult DeletePost(int id)
+        {
+            var post = posts.FirstOrDefault(p => p.Id == id);
+            if (post == null)
+            {
+                return NotFound("Post not found.");
+            }
+
+            posts.Remove(post);
+            return NoContent();
+        }
     }
 }
