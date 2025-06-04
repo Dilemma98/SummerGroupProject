@@ -55,5 +55,16 @@ namespace Backend.Controllers
             // Return no content to indicate success!
             return NoContent();
         }
+
+        [HttpGet("{id}")]
+        public IActionResult GetPostById(int id)
+        {
+            var post = posts.FirstOrDefault(p => p.Id == id);
+            if (post == null)
+            {
+                return NotFound("Post not found.");
+            }
+            return Ok(post);
+        }
     }
 }
