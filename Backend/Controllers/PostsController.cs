@@ -34,5 +34,26 @@ namespace Backend.Controllers
             posts.Add(post);
             return CreatedAtAction(nameof(GetPosts), new { id = post.Id }, post);
         }
+
+        [HttpPatch("{id}")]
+        public IActionResult UpdatePost(int id, [FromBody] Post updatedPost)
+        {
+            var post = posts.FirstOrDefault(p => p.Id == id);
+            if (post == null)
+            {
+                return NotFound("Post not found.");
+            }
+
+            if (updatedPost == null || string.IsNullOrEmpty(updatedPost.Title) || string.IsNullOrEmpty(updatedPost.Content) || string.IsNullOrEmpty(updatedPost.Author))
+            {
+                return BadRequest("Invalid post data.");
+            }
+
+            post.Title = updatedPost.Title;
+            post.Content = updatedPost.Content;
+            post.Author = updatedPost.Author;
+            // Return no content to indicate success!
+            return NoContent();
+        }
     }
 }
