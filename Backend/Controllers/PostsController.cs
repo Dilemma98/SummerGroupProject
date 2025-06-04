@@ -21,19 +21,48 @@ namespace Backend.Controllers
         }
 
         [HttpPost]
-        public IActionResult CreatePost([FromBody] Post post)
+        [Consumes("multipart/form-data")]
+        public async Task<IActionResult> CreatePost([FromForm] PostWithImageDto postDto)
         {
-            if (post == null || string.IsNullOrEmpty(post.Title) || string.IsNullOrEmpty(post.Content) || string.IsNullOrEmpty(post.Author))
+            if (string.IsNullOrWhiteSpace(postDto.Title) ||
+                string.IsNullOrWhiteSpace(postDto.Content) ||
+                string.IsNullOrWhiteSpace(postDto.Author))
             {
                 return BadRequest("Invalid post data.");
             }
 
-            // Simple ID generation
-            post.Id = posts.Count + 1;
-            post.CreatedAt = DateTime.Now;
+            string? imagePath = null;
+
+            if (postDto.Image != null)
+            {
+                var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
+                Directory.CreateDirectory(uploadsFolder);
+
+                var uniqueFileName = Guid.NewGuid().ToString() + Path.GetExtension(postDto.Image.FileName);
+                var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await postDto.Image.CopyToAsync(stream);
+                }
+
+                imagePath = $"/uploads/{uniqueFileName}";
+            }
+
+            var post = new Post
+            {
+                Id = posts.Count + 1,
+                Title = postDto.Title,
+                Content = postDto.Content,
+                Author = postDto.Author,
+                CreatedAt = DateTime.Now,
+                ImageUrl = imagePath
+            };
+
             posts.Add(post);
             return CreatedAtAction(nameof(GetPosts), new { id = post.Id }, post);
         }
+
 
         [HttpPatch("{id}")]
         public IActionResult UpdatePost(int id, [FromBody] Post updatedPost)
