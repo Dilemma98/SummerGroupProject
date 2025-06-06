@@ -28,6 +28,8 @@ if (app.Environment.IsDevelopment())
 
 // Map controllers
 app.MapControllers();
+// To serve static files (like images) from wwwroot
+app.UseStaticFiles();
 
 // Use CORS policy
 app.UseCors("AllowFrontend");

@@ -10,11 +10,6 @@
 </template>
 
 <style>
-.header{
-    color: green;
-    position:fixed;
-    top: 0;
-    left: 0;
-}
+
 </style>
 

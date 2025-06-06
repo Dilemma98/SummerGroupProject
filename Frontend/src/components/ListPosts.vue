@@ -6,8 +6,9 @@ interface Post {
     id: number;
     title: string;
     content: string;
+    imageUrl: string | null; // URL to the image, or null if no image
     author: string;
-    date: string; // ISO date string
+    createdAt: string; // ISO date string
 }
 
 // Reactive variable to store posts
@@ -42,8 +43,10 @@ onMounted(() => {
             <li v-for="post in posts" :key="post.id">
                 <h3 class="title">{{ post.title }}</h3>
                 <p class="content">{{ post.content }}</p>
-                <p class="author"><strong>Author:</strong> {{ post.author }}</p>
-                <p class="datePosted"><strong>Date:</strong> {{ new Date(post.date).toLocaleDateString() }}</p>
+                <img v-if="post.imageUrl" :src="`http://localhost:5196${post.imageUrl}`" alt="Post image" />
+                <img v-else />
+                <p class="author"><strong>Författare:</strong> {{ post.author }}</p>
+                <p class="datePosted"><strong>Datum:</strong> {{ new Date(post.createdAt).toLocaleDateString('sv-SE') }}</p>
             </li>
         </ul>
     </div>
