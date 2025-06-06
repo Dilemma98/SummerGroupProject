@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import CreatePost from './components/CreatePost.vue';
 import Header from './components/Header.vue';
 import ListPosts from './components/ListPosts.vue';
 </script>
@@ -6,6 +7,7 @@ import ListPosts from './components/ListPosts.vue';
 <template>
   <div>
     <Header />
+    <CreatePost />
     <ListPosts />
   </div>
 </template>
