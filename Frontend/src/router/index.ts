@@ -1,7 +1,7 @@
 // filepath: c:\Users\emmaa\Webbutvecklare .NET\Egna projekt\SummerGroupProject\Frontend\src\router\index.ts
 import { createRouter, createWebHistory } from 'vue-router';
 import type { RouteRecordRaw } from 'vue-router';
-import ListPosts from '../components/ListPosts.vue';
+import ListPosts from '../pages/ListPosts.vue';
 import CreatePost from '../pages/CreatePost.vue';
 
 const routes: RouteRecordRaw[] = [

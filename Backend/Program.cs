@@ -5,6 +5,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddOpenApi();
 //Add controllers
 builder.Services.AddControllers();
+// Add http client for Google API
+builder.Services.AddHttpClient();
 
 // Add CORS policy
 builder.Services.AddCors(options =>
