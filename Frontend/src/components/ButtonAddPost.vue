@@ -1,9 +1,10 @@
 <script setup lang="ts">
-
+  import { useUser } from '../composables/useUser';
+  const { user } = useUser();
 </script>
 
 <template>
-  <div class="button-container">
+  <div v-if="user && user.email" class="button-container">
     <router-link to="/create" class="add-post-button">
       Skriv något nytt!
     </router-link>

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-import ButtonAddPost from './ButtonAddPost.vue';
+import ButtonAddPost from '../components/ButtonAddPost.vue';
 // Type for a Post object
 interface Post {
     id: number;
@@ -22,7 +22,6 @@ onMounted(() => {
             if (!response.ok) {
                 throw new Error('Network response was not ok');
             }
-            console.log(response);
             return response.json();
         })
         .then(data => {
@@ -59,23 +58,23 @@ onMounted(() => {
 </template>
 
 <style scoped>
-@import url('https://fonts.cdnfonts.com/css/unifrakturmaguntia');
+    @import url('https://fonts.cdnfonts.com/css/unifrakturmaguntia');
 
 .posts-container {
-    width: 80vw;
+    width: 90vw;
     margin: auto;
+    margin-top: 2em;
 }
 ul {
     list-style-type: none;
-    
-    margin: 0 auto;
-    width: 75%;
+    width: 100%;
     background-color: #fff;
     font-family: Georgia, 'Times New Roman', Times, serif;
-    
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    grid-template-columns: repeat(3, 1fr); /* Alltid tre kolumner */
     gap: 3rem;
+    margin: 0 auto;
+    padding: 0;
 }
 
 li {
