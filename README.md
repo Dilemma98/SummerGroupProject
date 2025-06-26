@@ -27,7 +27,7 @@ npm run dev
 ```
 
 #### Google API - OAuth client ID
-För att möjliggöra inloggning med Google och åtkomst till kalendern behöver du skapa ett eget OAuth 2.0 Client ID via Google Cloud Console.
+För att möjliggöra inloggning med Google behöver du skapa ett eget OAuth 2.0 Client ID via Google Cloud Console.
 
 1. Gå till Google Cloud Console.
 
