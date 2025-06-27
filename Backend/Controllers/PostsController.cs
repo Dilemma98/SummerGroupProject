@@ -80,7 +80,6 @@ namespace Backend.Controllers
 
             post.Title = updatedPost.Title;
             post.Content = updatedPost.Content;
-            post.Author = updatedPost.Author;
             // Return no content to indicate success!
             return NoContent();
         }

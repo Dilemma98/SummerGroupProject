@@ -45,8 +45,7 @@ async function submitPost() {
       throw new Error('Network response was not ok');
     }
 
-    const result = await response.json();
-    console.log('Post submitted successfully:', result);
+
 
     // Reset the form after submission
     post.value.title = '';
