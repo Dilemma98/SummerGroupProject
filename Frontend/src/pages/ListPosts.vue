@@ -44,7 +44,6 @@ onMounted(() => {
             // Sort posts by createdAt in descending order
             posts.value = data.sort((a: Post, b: Post) =>
                 new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-
         })
         .catch(error => {
             // Log any error that occurs during the fetch
@@ -69,8 +68,15 @@ onMounted(() => {
                     </div>
                     <img v-else />
                     <p class="author"><strong>Författare:</strong> {{ post.author }}</p>
-                    <p class="datePosted"><strong>Datum:</strong> {{ new
-                        Date(post.createdAt).toLocaleDateString('sv-SE') }}
+                    <p class="datePosted" v-if="post.createdAt">
+                        <strong>Postat:</strong>
+                        {{
+                            new Date(post.createdAt).toLocaleDateString('sv-SE')
+                        }}
+                        <br/>
+                        {{
+                            new Date(post.createdAt).toLocaleTimeString('sv-SE', { hour: '2-digit', minute: '2-digit' })
+                        }}
                     </p>
                     <div class="edit-or-delete">
                         <EditPost :post="post" />

@@ -44,13 +44,9 @@ async function submitPost() {
     if (!response.ok) {
       throw new Error('Network response was not ok');
     }
-
-
-
     // Reset the form after submission
     post.value.title = '';
     post.value.content = '';
-    post.value.author = '';
     image.value = null;
 
     // Redirect to the home page 

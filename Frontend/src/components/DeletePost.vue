@@ -38,7 +38,8 @@ function handleDelete() {
 </script>
 
 <template>
- <div v-if="user.name === post.author">
+    <!-- Checks if user is signed in and is the same as author of post -->
+ <div v-if="user && user.email && user.name === post.author">
     <i class="fa-solid fa-trash" @click="handleDelete"></i>
   </div>
 </template>
