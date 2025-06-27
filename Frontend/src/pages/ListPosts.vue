@@ -1,6 +1,22 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import ButtonAddPost from '../components/ButtonAddPost.vue';
+import EditPost from '../components/EditPost.vue';
+import DeletePost from '../components/DeletePost.vue';
+// Toggle for image display
+const openImagePostId = ref<number | null>(null);
+
+function openImage(postId: number) {
+    openImagePostId.value = postId;
+}
+function closeImage() {
+    openImagePostId.value = null;
+}
+
+function removePost(id: number) {
+    posts.value = posts.value.filter(p => p.id !== id);
+}
+
 // Type for a Post object
 interface Post {
     id: number;
@@ -26,8 +42,9 @@ onMounted(() => {
         })
         .then(data => {
             // Sort posts by createdAt in descending order
-            posts.value = data.sort((a: Post, b: Post) => 
-            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+            posts.value = data.sort((a: Post, b: Post) =>
+                new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
         })
         .catch(error => {
             // Log any error that occurs during the fetch
@@ -45,12 +62,20 @@ onMounted(() => {
                 <div class="post">
                     <h3 class="title">{{ post.title }}</h3>
                     <p class="content">{{ post.content }}</p>
-                    <img v-if="post.imageUrl" :src="`http://localhost:5196${post.imageUrl}`" alt="Post image" />
+                    <img v-if="post.imageUrl" :src="`http://localhost:5196${post.imageUrl}`" alt="Post image"
+                        class="post-image" @click="openImage(post.id)" />
+                    <div v-if="openImagePostId === post.id" class="image-overlay" @click="closeImage">
+                        <img :src="`http://localhost:5196${post.imageUrl}`" alt="Post image" class="fullscreen-image" />
+                    </div>
                     <img v-else />
                     <p class="author"><strong>Författare:</strong> {{ post.author }}</p>
                     <p class="datePosted"><strong>Datum:</strong> {{ new
                         Date(post.createdAt).toLocaleDateString('sv-SE') }}
                     </p>
+                    <div class="edit-or-delete">
+                        <EditPost :post="post" />
+                        <DeletePost :post="post" @deleted="removePost" />
+                    </div>
                 </div>
             </li>
         </ul>
@@ -58,20 +83,22 @@ onMounted(() => {
 </template>
 
 <style scoped>
-    @import url('https://fonts.cdnfonts.com/css/unifrakturmaguntia');
+@import url('https://fonts.cdnfonts.com/css/unifrakturmaguntia');
 
 .posts-container {
     width: 90vw;
     margin: auto;
     margin-top: 2em;
 }
+
 ul {
     list-style-type: none;
     width: 100%;
     background-color: #fff;
     font-family: Georgia, 'Times New Roman', Times, serif;
     display: grid;
-    grid-template-columns: repeat(3, 1fr); /* Alltid tre kolumner */
+    grid-template-columns: repeat(3, 1fr);
+    /* Alltid tre kolumner */
     gap: 3rem;
     margin: 0 auto;
     padding: 0;
@@ -83,12 +110,12 @@ li {
     border-radius: 10px;
     background-color: #fcfcfc;
 
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     transition: box-shadow 0.3s ease;
 }
 
 li:hover {
-    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
 }
 
 .title {
@@ -109,18 +136,35 @@ li:hover {
     max-width: 90%;
 }
 
-img {
+.post-image {
     display: block;
     max-width: 100%;
     height: auto;
     margin: 1.5rem auto;
     border-radius: 6px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-    transition: transform 0.3s ease;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    transition: box-shadow 0.3s;
 }
-img:hover {
-    transform: scale(2.7); 
-    z-index: 10;
+
+.image-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.256);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.fullscreen-image {
+    max-width: 90vw;
+    max-height: 90vh;
+    border-radius: 10px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
 }
 
 .author,
@@ -133,4 +177,11 @@ img:hover {
     letter-spacing: 0.03em;
 }
 
+.edit-or-delete {
+    width: 7em;
+    align-items: flex-start;
+    display: flex;
+    gap: 2rem;
+    margin-top: 3rem;
+}
 </style>
