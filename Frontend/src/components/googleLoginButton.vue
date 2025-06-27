@@ -7,7 +7,6 @@ const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 
 function handleCredentialResponse(response: any) {
     const idToken = response.credential;
-    console.log('ID Token:', idToken);
     fetch('http://localhost:5196/api/Google/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
