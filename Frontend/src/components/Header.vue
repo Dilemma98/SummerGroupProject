@@ -3,9 +3,6 @@ import GoogleLoginButton from './googleLoginButton.vue';
 import LogoutButton from './logoutButton.vue';
 import { useUser } from '../composables/useUser';
 const { user } = useUser();
-
-
-console.log('User from header:', user.value); // Logga användaren för felsökning
 </script>
 
 <template>
