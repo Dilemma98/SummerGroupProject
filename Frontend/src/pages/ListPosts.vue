@@ -100,7 +100,7 @@ onMounted(() => {
 ul {
     list-style-type: none;
     width: 100%;
-    background-color: #fff;
+    background-color: rgb(232, 231, 229);
     font-family: Georgia, 'Times New Roman', Times, serif;
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -114,8 +114,7 @@ li {
     border: 1px solid #ccc;
     padding: 2rem 1.8rem;
     border-radius: 10px;
-    background-color: #fcfcfc;
-
+    background-color: rgb(239, 238, 236);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     transition: box-shadow 0.3s ease;
 }

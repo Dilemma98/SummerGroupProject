@@ -53,6 +53,6 @@ onMounted(() => {
 #googleSignInDiv {
     margin: 2rem auto;
     text-align: center;
-    width: 15em;
+    width: 13em;
 }
 </style>

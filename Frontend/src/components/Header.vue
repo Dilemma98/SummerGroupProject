@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import GoogleLoginButton from './googleLoginButton.vue';
-import LogoutButton from './logoutButton.vue';
+import GoogleLoginButton from './GoogleLoginButton.vue';
+import LogoutButton from './LogoutButton.vue';
 import { useUser } from '../composables/useUser';
 const { user } = useUser();
 </script>
@@ -29,8 +29,8 @@ const { user } = useUser();
   margin: auto;
   display: flex;
   align-items: center;
-  justify-content: space-between; /* Lägg till denna rad */
-  gap: 2rem; /* Lägg till mellanrum mellan elementen */
+  justify-content: space-between;
+  gap: 2rem; 
 }
 
 .newspaper-title {
@@ -41,7 +41,7 @@ const { user } = useUser();
 }
 
 .button-container {
-  margin: 0; /* Ta bort stor marginal så knappen inte trycks ut */
+  margin: 0;
 }
 
 .welcomeUserText {
