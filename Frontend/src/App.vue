@@ -6,9 +6,13 @@ import Header from './components/Header.vue';
   <div>
     <Header />
     <router-link to="/create"></router-link>
-    <router-view /> <!-- Här visas rätt sida beroende på route -->
+    <router-view />
   </div>
 </template>
-<style>
 
+<style>
+body{
+  background-color: rgb(232, 231, 229);
+}
 </style>
+
