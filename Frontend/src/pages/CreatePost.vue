@@ -5,7 +5,6 @@ import { useUser } from '../composables/useUser';
 const { user } = useUser();
 // Importing the router to navigate after submission
 const router = useRouter();
-
 // Type for a Post object
 const post = ref({
   title: '',
@@ -50,7 +49,7 @@ async function submitPost() {
     image.value = null;
 
     // Redirect to the home page 
-    router.push('/');
+   router.replace('/');
   }
   catch (error) {
     console.error('Error submitting post:', error);
@@ -87,7 +86,7 @@ async function submitPost() {
   width: 90vw;
   margin: 2rem auto;
   font-family: Georgia, 'Times New Roman', Times, serif;
-  background-color: #fcfcfc;
+  background-color: rgb(239, 238, 236);
   padding: 2rem 3rem;
   border-radius: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);

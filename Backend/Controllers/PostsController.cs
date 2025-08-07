@@ -1,6 +1,7 @@
 using Backend.Models;
-using Microsoft.AspNetCore.Http;
+using Backend.Data;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Backend.Controllers
 {
@@ -8,16 +9,28 @@ namespace Backend.Controllers
     [ApiController]
     public class PostsController : ControllerBase
     {
-        private static List<Post> posts = new List<Post>
+        private readonly ApplicationDbContext _context;
+
+        public PostsController(ApplicationDbContext context)
         {
-            new Post { Id = 1, Title = "First Post", Content = "This is the content of the first post.", Author = "Author1", CreatedAt = DateTime.Now, ImageUrl="" },
-            new Post { Id = 2, Title = "Second Post", Content = "This is the content of the second post.", Author = "Author2", CreatedAt = DateTime.Now, ImageUrl="" },
-        };
+            _context = context;
+        }
 
         [HttpGet]
-        public IActionResult GetPosts()
+        public async Task<IActionResult> GetPosts()
         {
+            var posts = await _context.Posts.ToListAsync();
             return Ok(posts);
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetPostById(int id)
+        {
+            var post = await _context.Posts.FindAsync(id);
+            if (post == null)
+                return NotFound("Post not found.");
+
+            return Ok(post);
         }
 
         [HttpPost]
@@ -38,73 +51,73 @@ namespace Backend.Controllers
                 var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
                 Directory.CreateDirectory(uploadsFolder);
 
-                var uniqueFileName = Guid.NewGuid().ToString() + Path.GetExtension(postDto.Image.FileName);
+                var uniqueFileName = Guid.NewGuid() + Path.GetExtension(postDto.Image.FileName);
                 var filePath = Path.Combine(uploadsFolder, uniqueFileName);
 
-                using (var stream = new FileStream(filePath, FileMode.Create))
-                {
-                    await postDto.Image.CopyToAsync(stream);
-                }
+                using var stream = new FileStream(filePath, FileMode.Create);
+                await postDto.Image.CopyToAsync(stream);
 
                 imagePath = $"/uploads/{uniqueFileName}";
             }
 
             var post = new Post
             {
-                Id = posts.Count + 1,
                 Title = postDto.Title,
                 Content = postDto.Content,
                 Author = postDto.Author,
-                CreatedAt = DateTime.Now,
+                CreatedAt = DateTime.UtcNow,
                 ImageUrl = imagePath
             };
 
-            posts.Add(post);
-            return CreatedAtAction(nameof(GetPosts), new { id = post.Id }, post);
+            _context.Posts.Add(post);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction(nameof(GetPostById), new { id = post.Id }, post);
         }
 
-
         [HttpPatch("{id}")]
-        public IActionResult UpdatePost(int id, [FromBody] Post updatedPost)
+        public async Task<IActionResult> UpdatePost(int id, [FromBody] Post updatedPost)
         {
-            var post = posts.FirstOrDefault(p => p.Id == id);
-            if (post == null)
-            {
-                return NotFound("Post not found.");
-            }
-
-            if (updatedPost == null || string.IsNullOrEmpty(updatedPost.Title) || string.IsNullOrEmpty(updatedPost.Content) || string.IsNullOrEmpty(updatedPost.Author))
+            if (updatedPost == null ||
+                string.IsNullOrEmpty(updatedPost.Title) ||
+                string.IsNullOrEmpty(updatedPost.Content) ||
+                string.IsNullOrEmpty(updatedPost.Author))
             {
                 return BadRequest("Invalid post data.");
             }
 
+            var post = await _context.Posts.FindAsync(id);
+            if (post == null)
+                return NotFound("Post not found.");
+
             post.Title = updatedPost.Title;
             post.Content = updatedPost.Content;
-            // Return no content to indicate success!
+            post.Author = updatedPost.Author;
+
+            await _context.SaveChangesAsync();
+
             return NoContent();
         }
 
-        [HttpGet("{id}")]
-        public IActionResult GetPostById(int id)
-        {
-            var post = posts.FirstOrDefault(p => p.Id == id);
-            if (post == null)
-            {
-                return NotFound("Post not found.");
-            }
-            return Ok(post);
-        }
-
         [HttpDelete("{id}")]
-        public IActionResult DeletePost(int id)
+        public async Task<IActionResult> DeletePost(int id)
         {
-            var post = posts.FirstOrDefault(p => p.Id == id);
+            var post = await _context.Posts.FindAsync(id);
             if (post == null)
-            {
                 return NotFound("Post not found.");
-            }
 
-            posts.Remove(post);
+            _context.Posts.Remove(post);
+            try
+    {
+        await _context.SaveChangesAsync();
+    }
+    catch (Exception ex)
+    {
+        // Logga detaljerat fel (om du har ILogger kan du använda det)
+        Console.WriteLine($"Fel vid borttagning av post: {ex.Message}");
+        return StatusCode(500, "Ett fel uppstod vid borttagning.");
+    }
+
             return NoContent();
         }
     }

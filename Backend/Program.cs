@@ -1,3 +1,5 @@
+using Microsoft.EntityFrameworkCore;
+using Backend.Data;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -7,6 +9,12 @@ builder.Services.AddOpenApi();
 builder.Services.AddControllers();
 // Add http client for Google API
 builder.Services.AddHttpClient();
+
+// PostgreSQL database context
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"),
+    npgsqlOptions => npgsqlOptions.CommandTimeout(60)));
+    
 
 // Add CORS policy
 builder.Services.AddCors(options =>

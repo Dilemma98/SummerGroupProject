@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import GoogleLoginButton from './GoogleLoginButton.vue';
+import GoogleLoginButton from './googleLoginButton.vue';
 import LogoutButton from './LogoutButton.vue';
 import { useUser } from '../composables/useUser';
 const { user } = useUser();

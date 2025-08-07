@@ -65,12 +65,12 @@ function updatePost() {
 <template>
   <!-- Checks if user is signed in and is the same as author of post -->
   <div v-if="user && user.email && user.name === post.author">
-    <i class="fa-solid fa-pencil" @click="handleEdit"></i>
+    <button @click="handleEdit"><i class="fa-solid fa-pencil"></i></button>
   </div>
   <div v-if="isEditing">
     <input v-model="editTitle" placeholder="Edit title" />
     <textarea v-model="editContent" placeholder="Edit content"></textarea>
-    <i class="fa-solid fa-floppy-disk" @click="updatePost"></i>
+    <button @click="updatePost"><i class="fa-solid fa-floppy-disk"></i></button>
   </div>
 </template>
 

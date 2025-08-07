@@ -1,8 +1,12 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch } from 'vue';
+import { useRoute } from 'vue-router';
 import ButtonAddPost from '../components/ButtonAddPost.vue';
 import EditPost from '../components/EditPost.vue';
 import DeletePost from '../components/DeletePost.vue';
+
+const route = useRoute();
+
 // Toggle for image display
 const openImagePostId = ref<number | null>(null);
 
@@ -17,6 +21,7 @@ function removePost(id: number) {
     posts.value = posts.value.filter(p => p.id !== id);
 }
 
+
 // Type for a Post object
 interface Post {
     id: number;
@@ -30,9 +35,8 @@ interface Post {
 // Reactive variable to store posts
 const posts = ref<Post[]>([]);
 
-// Runs when the component is mounted to the DOM
-onMounted(() => {
-    // Fetch posts from the backend API
+function fetchPosts(){
+      // Fetch posts from the backend API
     fetch('http://localhost:5196/api/posts')
         .then(response => {
             if (!response.ok) {
@@ -49,7 +53,17 @@ onMounted(() => {
             // Log any error that occurs during the fetch
             console.error('There has been a problem with your fetch operation:', error);
         });
+}
+// Runs when the component is mounted to the DOM
+onMounted(() => { 
+    fetchPosts(); 
 });
+watch(
+    () => route.fullPath,
+    () => {
+        fetchPosts();
+    }
+);
 </script>
 
 <template>
@@ -92,22 +106,18 @@ onMounted(() => {
 @import url('https://fonts.cdnfonts.com/css/unifrakturmaguntia');
 
 .posts-container {
-    width: 90vw;
+    width: 60vw;
     margin: auto;
     margin-top: 2em;
 }
 
 ul {
     list-style-type: none;
-    width: 100%;
+    width: 70%;
     background-color: rgb(232, 231, 229);
     font-family: Georgia, 'Times New Roman', Times, serif;
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    /* Alltid tre kolumner */
-    gap: 3rem;
     margin: 0 auto;
-    padding: 0;
+   
 }
 
 li {
@@ -117,6 +127,7 @@ li {
     background-color: rgb(239, 238, 236);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     transition: box-shadow 0.3s ease;
+    margin-top: 2em;
 }
 
 li:hover {
@@ -139,11 +150,12 @@ li:hover {
     line-height: 1.8;
     color: #333;
     max-width: 90%;
+    margin: auto;
 }
 
 .post-image {
     display: block;
-    max-width: 100%;
+    max-width: 80%;
     height: auto;
     margin: 1.5rem auto;
     border-radius: 6px;
@@ -167,7 +179,7 @@ li:hover {
 
 .fullscreen-image {
     max-width: 90vw;
-    max-height: 90vh;
+    height: 95vh;
     border-radius: 10px;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
 }
