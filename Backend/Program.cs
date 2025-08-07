@@ -1,28 +1,35 @@
 using Microsoft.EntityFrameworkCore;
 using Backend.Data;
+using DotNetEnv;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
-//Add controllers
-builder.Services.AddControllers();
-// Add http client for Google API
-builder.Services.AddHttpClient();
+// Load environment variables from the .env file
+DotNetEnv.Env.Load();
 
-// PostgreSQL database context
+// Read the database connection string from environment variables
+var connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
+
+// Add services to the container
+builder.Services.AddOpenApi(); // Swagger/OpenAPI support
+builder.Services.AddControllers(); // Enable MVC controllers
+builder.Services.AddHttpClient(); // HTTP client support for external APIs
+
+// Configure Entity Framework with PostgreSQL
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"),
-    npgsqlOptions => npgsqlOptions.CommandTimeout(60)));
-    
+    options.UseNpgsql(connectionString, npgsqlOptions =>
+    {
+        npgsqlOptions.CommandTimeout(60); // Optional: Set command timeout
+    })
+);
 
-// Add CORS policy
+// Configure CORS to allow frontend access (e.g., Vite/Vue app)
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend",
         policy =>
         {
-            policy.WithOrigins("http://localhost:5173") // Din Vite/Vue-port
+            policy.WithOrigins("http://localhost:5173") // Frontend origin
                   .AllowAnyHeader()
                   .AllowAnyMethod();
         });
@@ -30,20 +37,16 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Enable Swagger UI only in development
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
 }
 
-// Map controllers
-app.MapControllers();
-// To serve static files (like images) from wwwroot
-app.UseStaticFiles();
+// Middleware pipeline
+app.UseCors("AllowFrontend");       // Enable CORS
+app.UseStaticFiles();               // Serve static files from wwwroot
+app.MapControllers();               // Enable API routes
+// app.UseHttpsRedirection();       // Optional: enable HTTPS redirection
 
-// Use CORS policy
-app.UseCors("AllowFrontend");
-// app.UseHttpsRedirection();
 app.Run();
-
-
