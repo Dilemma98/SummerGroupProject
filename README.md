@@ -4,46 +4,122 @@ Detta är ett sommarprojekt mellan WU-24-studenterna [Tuva Gyllensten](https://g
 
 Projektet består av en liten blogg där vi kan uppdatera varandra om våra sommaraktiviteter.
 
+---
+
 ## 🧭 Kom igång
 
 ### 1. Klona ner projektet
 Börja med att klona ner projektet i valfri mapp:
+
 ```bash
 git clone https://github.com/Dilemma98/SummerGroupProject.git
+2. Backend
+Gå till backend-mappen:
 
-```
-### 2. Backend
-```bash
+bash
+Kopiera kod
 cd backend
+Installera beroenden och starta backend:
+
+bash
+Kopiera kod
 dotnet restore
 dotnet run
-```
+Backend körs då på http://localhost:5196.
 
-### 3. Frontend
-```bash
+3. Frontend
+Gå till frontend-mappen:
+
+bash
+Kopiera kod
 cd frontend
+Installera beroenden:
+
+bash
+Kopiera kod
 npm install
+Starta frontend:
+
+bash
+Kopiera kod
 npm run dev
-```
+Frontend körs på http://localhost:5173.
 
-#### Google API - OAuth client ID
-För att möjliggöra inloggning med Google behöver du skapa ett eget OAuth 2.0 Client ID via Google Cloud Console.
+🔑 Google API Setup
+1. OAuth 2.0 Client ID (för inloggning)
+Gå till Google Cloud Console.
 
-1. Gå till Google Cloud Console.
+Skapa ett nytt projekt eller välj ett befintligt.
 
-2. Skapa ett nytt projekt eller välj ett befintligt projekt.
+Navigera till API & Services → Credentials.
 
-3. Gå till API & Services > Credentials.
+Klicka på Create Credentials → OAuth 2.0 Client ID.
 
-4. Klicka på Create Credentials och välj OAuth 2.0 Client IDs.
+Välj applikationstyp Web application.
 
-5. Välj en lämplig applikationstyp (vanligtvis "Web application").
+Ange redirect URI:
 
-6. När du skapar ditt Client ID, kommer du behöva ange en redirect URI. Där klistrar du in http://localhost:5173
+arduino
+Kopiera kod
+http://localhost:5173
+Kopiera Client ID och skapa en .env-fil i frontend-mappen:
 
-7. När du har skapat din OAuth 2.0 Client ID, kopiera client_id och skapa en .env- fil i roten av frontend-mappen där du lägger in detta.
-
-```bash
+bash
+Kopiera kod
 VITE_GOOGLE_CLIENT_ID="din-client-id"
-```
-Och byt ut "din-client-id" mot den du fick från Google Cloud Console
+2. Google Sheets Setup (för att lagra poster)
+Skapa ett Google Sheet med kolumner:
+
+nginx
+Kopiera kod
+Title | Content | ImageUrl | Author | AuthorImgUrl | CreatedAt
+Skapa en Google Service Account i Google Cloud:
+
+Gå till IAM & Admin → Service Accounts → Create Service Account
+
+Ge den ett namn, t.ex. sheetswriter.
+
+Ge rollen Editor (för att kunna skriva till Sheet).
+
+Ladda ner JSON-nyckeln (service-account.json).
+
+Dela ditt Google Sheet med service account email (t.ex. sheetswriter@summergroupproject.iam.gserviceaccount.com) med Editor-rättigheter.
+
+Lägg JSON-filen i backend-projektets rotmapp och se till att filen heter exakt:
+
+bash
+Kopiera kod
+backend/service-account.json
+Lägg Sheet ID i appsettings.json:
+
+json
+Kopiera kod
+{
+  "GOOGLE_SHEET_ID": "ditt-sheet-id"
+}
+Du hittar Sheet ID i URL:en till ditt Google Sheet, t.ex. https://docs.google.com/spreadsheets/d/<sheet-id>/edit.
+
+⚙️ API Endpoints
+GET /api/posts – Hämta alla poster
+
+POST /api/posts – Skapa ny post (kräver inloggning)
+
+PATCH /api/posts/{rowNumber} – Uppdatera post
+
+DELETE /api/posts/{rowNumber} – Ta bort post
+
+📝 Testa projektet
+Öppna frontend i webbläsaren: http://localhost:5173.
+
+Logga in med Google.
+
+Lägg till, redigera och ta bort poster.
+
+Klicka på bilder för fullscreen-visning.
+
+⚠️ Noteringar
+Endast inloggade användare kan skapa poster.
+
+Poster lagras i Google Sheets via service account.
+
+Bilder lagras lokalt i wwwroot/uploads.

@@ -7,8 +7,10 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+service-account.json
+
 node_modules
-dist
+dist/
 dist-ssr
 *.local
 
@@ -22,3 +24,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Env-file
+.env

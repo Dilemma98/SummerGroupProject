@@ -31,6 +31,7 @@ async function submitPost() {
   formData.append('title', post.value.title);
   formData.append('content', post.value.content);
   formData.append('author', post.value.author);
+  formData.append('authorImgUrl', user.value.picture)
   if (image.value) {
     formData.append('image', image.value);
   }

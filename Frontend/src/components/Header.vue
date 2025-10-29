@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import GoogleLoginButton from './GoogleLoginButton.vue';
-import LogoutButton from './LogoutButton.vue';
+import GoogleLoginButton from './googleLoginButton.vue';
+import LogoutButton from './logoutButton.vue';
 import { useUser } from '../composables/useUser';
 const { user } = useUser();
 </script>
@@ -12,7 +12,7 @@ const { user } = useUser();
       <GoogleLoginButton />
     </div>
     <div v-if="user && user.email" class="welcomeUserText">
-      <h3>Välkommen {{user.name}}! <img :src="user.picture" alt=""></h3>
+      <h3>Välkommen {{user.name}}! <img class="userImg" :src="user.picture" alt=""></h3>
     </div>
     <LogoutButton v-if="user && user.email" />
   </header>
@@ -54,9 +54,10 @@ const { user } = useUser();
   gap: 1rem;
 }
 
-img {
+.userImg {
   border-radius: 50%;
   height: 2.5em;
   margin-left: 0.5em;
+  transform: translateY(0.5em);
 }
 </style>

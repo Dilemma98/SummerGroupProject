@@ -1,18 +1,29 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import ButtonAddPost from '../components/ButtonAddPost.vue';
 import EditPost from '../components/EditPost.vue';
 import DeletePost from '../components/DeletePost.vue';
-// Toggle for image display
-const openImagePostId = ref<number | null>(null);
+import { useUser } from '../composables/useUser';
 
-function openImage(postId: number) {
-    openImagePostId.value = postId;
+// Track the currently open post and image
+const openImagePostId = ref<number | null>(null);
+const openImageUrl = ref<string | null>(null);
+
+// User information
+const { user } = useUser();
+const isLoggedIn = computed(() => !!user.value);
+
+// Functions to open/close image overlay
+function openImage(post: Post) {
+    openImagePostId.value = post.id;
+    openImageUrl.value = post.imageUrl;
 }
 function closeImage() {
     openImagePostId.value = null;
+    openImageUrl.value = null;
 }
 
+// Remove post from posts array
 function removePost(id: number) {
     posts.value = posts.value.filter(p => p.id !== id);
 }
@@ -22,17 +33,17 @@ interface Post {
     id: number;
     title: string;
     content: string;
-    imageUrl: string | null; // URL to the image, or null if no image
+    imageUrl: string | null;
     author: string;
-    createdAt: string; // ISO date string
+    authorImgUrl: string;
+    createdAt: string;
 }
 
-// Reactive variable to store posts
+// Reactive posts array
 const posts = ref<Post[]>([]);
 
-// Runs when the component is mounted to the DOM
+// Fetch posts when component is mounted
 onMounted(() => {
-    // Fetch posts from the backend API
     fetch('http://localhost:5196/api/posts')
         .then(response => {
             if (!response.ok) {
@@ -41,51 +52,67 @@ onMounted(() => {
             return response.json();
         })
         .then(data => {
-            // Sort posts by createdAt in descending order
+            // Sort posts by creation date descending
             posts.value = data.sort((a: Post, b: Post) =>
-                new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+                new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+            );
         })
         .catch(error => {
-            // Log any error that occurs during the fetch
             console.error('There has been a problem with your fetch operation:', error);
         });
 });
 </script>
 
 <template>
-    <ButtonAddPost />
-    <div class="posts-container">
-        <ul>
-            <!-- Loop through posts and display each one -->
-            <li v-for="post in posts" :key="post.id">
-                <div class="post">
-                    <h3 class="title">{{ post.title }}</h3>
-                    <p class="content">{{ post.content }}</p>
-                    <img v-if="post.imageUrl" :src="`http://localhost:5196${post.imageUrl}`" alt="Post image"
-                        class="post-image" @click="openImage(post.id)" />
-                    <div v-if="openImagePostId === post.id" class="image-overlay" @click="closeImage">
-                        <img :src="`http://localhost:5196${post.imageUrl}`" alt="Post image" class="fullscreen-image" />
-                    </div>
-                    <img v-else />
-                    <p class="author"><strong>Författare:</strong> {{ post.author }}</p>
-                    <p class="datePosted" v-if="post.createdAt">
-                        <strong>Postat:</strong>
-                        {{
-                            new Date(post.createdAt).toLocaleDateString('sv-SE')
-                        }}
-                        <br/>
-                        {{
-                            new Date(post.createdAt).toLocaleTimeString('sv-SE', { hour: '2-digit', minute: '2-digit' })
-                        }}
-                    </p>
-                    <div class="edit-or-delete">
-                        <EditPost :post="post" />
-                        <DeletePost :post="post" @deleted="removePost" />
-                    </div>
-                </div>
-            </li>
-        </ul>
-    </div>
+  <ButtonAddPost />
+  <div class="posts-container">
+    <ul>
+      <li v-for="post in posts" :key="post.id">
+        <div class="post" :class="{ 'blurred': !isLoggedIn }">
+          <h3 class="title">{{ post.title }}</h3>
+          <p class="content">{{ post.content }}</p>
+
+          <!-- Post image -->
+          <img 
+            v-if="post.imageUrl" 
+            :src="`http://localhost:5196${post.imageUrl}`" 
+            alt="Post image" 
+            class="post-image" 
+            :class="{ 'blurred': !isLoggedIn }" 
+            @click="openImage(post)" 
+          />
+
+          <!-- Author info -->
+          <p class="author">
+            <strong>Författare:</strong> {{ post.author }}
+            <img v-if="post.authorImgUrl" class="authorImg" :src="post.authorImgUrl" alt="Författarbild" />
+          </p>
+
+          <!-- Date posted -->
+          <p class="datePosted" v-if="post.createdAt">
+            <strong>Postat:</strong>
+            {{ new Date(post.createdAt).toLocaleDateString('sv-SE') }}<br/>
+            {{ new Date(post.createdAt).toLocaleTimeString('sv-SE', { hour: '2-digit', minute: '2-digit' }) }}
+          </p>
+
+          <!-- Edit and Delete buttons -->
+          <div class="edit-or-delete">
+            <EditPost :post="post" />
+            <DeletePost :post="post" @deleted="removePost" />
+          </div>
+        </div>
+      </li>
+    </ul>
+  </div>
+
+  <!-- Fullscreen overlay for image -->
+  <div v-if="openImageUrl" class="image-overlay" @click="closeImage">
+    <img 
+      :src="`http://localhost:5196${openImageUrl}`" 
+      alt="Post image" 
+      class="fullscreen-image" 
+    />
+  </div>
 </template>
 
 <style scoped>
@@ -104,7 +131,6 @@ ul {
     font-family: Georgia, 'Times New Roman', Times, serif;
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    /* Alltid tre kolumner */
     gap: 3rem;
     margin: 0 auto;
     padding: 0;
@@ -172,12 +198,11 @@ li:hover {
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
 }
 
-.author,
 .datePosted {
     font-size: 0.85rem;
     color: #666;
     font-style: italic;
-    margin-top: 0.3rem;
+    margin-top: -0.5rem;
     text-align: right;
     letter-spacing: 0.03em;
 }
@@ -188,5 +213,39 @@ li:hover {
     display: flex;
     gap: 2rem;
     margin-top: 3rem;
+}
+
+.blurred {
+  filter: blur(5px);
+  pointer-events: none;
+  user-select: none;
+  opacity: 0.8;
+  transition: filter 0.3s ease, opacity 0.3s ease;
+}
+
+.authorImg {
+    width: 2em;
+    border-radius: 1em;
+    padding-top: 1em;
+}
+
+.author {
+    font-size: 0.85rem;
+    color: #666;
+    font-style: italic;
+    margin-top: 0.3rem;
+    text-align: right;
+    letter-spacing: 0.03em;
+    display: flex;
+    align-items: center; 
+    justify-content: flex-end; 
+    gap: 0.5em; 
+}
+
+.authorImg {
+    width: 2em;
+    padding-top: 1em; 
+    object-fit: cover;
+    transform: translateY(-0.40em);
 }
 </style>
