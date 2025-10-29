@@ -30,7 +30,7 @@ publish/
 
 # Secrets
 secrets.json
-service-account.json
+Backend/service-account.json
 
 # Test results
 TestResults/
